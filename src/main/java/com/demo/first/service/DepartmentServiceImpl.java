@@ -1,12 +1,14 @@
 package com.demo.first.service;
 
 import com.demo.first.entity.Department;
+import com.demo.first.error.DepartmentNotFoundException;
 import com.demo.first.repository.DepartmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import static java.util.Objects.*;
 
@@ -26,9 +28,13 @@ public class DepartmentServiceImpl implements DepartmentService{
     }
 
     @Override
-    public Department fetchDepartmentById(Long departmentId) {
+    public Department fetchDepartmentById(Long departmentId) throws DepartmentNotFoundException {
         //since JPA repository returns optional for findById, we need to use get() on it to retrieve the value
-        return departmentRepository.findById(departmentId).get();
+        Optional<Department> department = departmentRepository.findById(departmentId);
+        if(((Optional<?>) department).isEmpty()){
+            throw new DepartmentNotFoundException("Department Not available");
+        }
+        return department.get();
     }
 
     @Override
